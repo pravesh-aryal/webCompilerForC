@@ -33,12 +33,12 @@ def create_app(test_config = None):
     @app.route('/home')
     def home():
         return "THIS IS THE HOME PAGE"
-    @app.route('/suyog')
-    def suyog():
+    @app.route('/<name>')
+    def suyog(name):
 
         # return "<h1 style='background-color:DodgerBlue'> Suyong randi ko ban ho muji bhode khate sala </h1>"
         return """<marquee>
-            <h1 style="background-color:DodgerBlue; text-align:center"> SUYOG </h1>
+            <h1 style="background-color:DodgerBlue; text-align:center"> {name=name} </h1>
             </marquee>
         """
         return """
@@ -75,6 +75,9 @@ def create_app(test_config = None):
 </body>
 </html>
 """
+
+    from . import auth
+    app.register_blueprint(auth.bp)
     return app
 
 
