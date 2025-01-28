@@ -20,11 +20,13 @@ try:
         stdout=subprocess.PIPE,            # Capture standard output
         stderr=subprocess.PIPE             # Capture standard error
     )
+
     
     # Display the program's output
     print("Program Output:")
     output_string = result.stdout.decode()
     print(output_string)          # Decode and print the output from the executable
+    
     
 except subprocess.CalledProcessError as e:
     print("An error occurred!")
