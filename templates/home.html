@@ -4,30 +4,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C Code Editor</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --bg-color: #f5f5f5;
+            --editor-bg: #1e1e1e;
+            --editor-text: #d4d4d4;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .editor-section, .output-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .editor-container {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        #codeEditor {
+            width: 100%;
+            height: 500px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            background-color: var(--editor-bg);
+            color: var(--editor-text);
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            background-color: #6c757d;
+        }
+
+        .button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .output-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+        }
+
+        .output-content {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #333;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .placeholder {
+            color: #666;
+            font-style: italic;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-<body style="background-color: #f5f5f5; font-family: Arial, sans-serif; margin: 0; padding: 20px;">
-    <div style="display: flex; flex-direction: row; gap: 40px; max-width: 1200px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-        <div style="flex: 1;">
-            <h1 style="color: #2c3e50; margin-bottom: 20px; font-size: 24px;">C Code Editor</h1>
-            <form action="/run/" method="post">
-                <textarea name="programByUser" id="" rows="25" cols="25" 
-                    style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px; resize: none; background-color: #f8f9fa;"
-                    placeholder="Enter your C code here..."></textarea>
-                <button name="runCodeBtn" type="submit" 
-                    style="background-color: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 15px; transition: background-color 0.3s;"
-                    onmouseover="this.style.backgroundColor='#45a049'" 
-                    onmouseout="this.style.backgroundColor='#4CAF50'">Run Code</button>
+<body>
+    <div class="container">
+        <div class="editor-section">
+            <h1 class="title">C Code Editor</h1>
+            <form id="codeForm" action="/run/" method="post">
+                <div class="editor-container">
+                    <textarea id="codeEditor" name="programByUser" spellcheck="false">{{ code if code else '' }}</textarea>
+                </div>
+                <div class="button-container">
+                    <button type="submit" class="button">Run Code</button>
+                    <button type="button" class="button secondary" onclick="clearCode()">Clear</button>
+                    <button type="button" class="button secondary" onclick="resetToDefault()">Reset to Default</button>
+                </div>
+                <div class="status-bar">
+                    <span id="saveStatus">All changes saved</span>
+                    <span id="charCount">Characters: 0</span>
+                </div>
             </form>
         </div>
 
-        <div style="flex: 1; background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 2px solid #e0e0e0;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Output</h2>
-            {% if code_result %}
-                <p style="font-family: 'Courier New', monospace; background-color: white; padding: 15px; border-radius: 6px; margin: 0; white-space: pre-wrap; font-size: 14px; color: #333;">{{code_result}}</p>
-            {% else %}
-                <p style="color: #666; font-style: italic;">Output will appear here after running the code...</p>
-            {% endif %}
+        <div class="output-section">
+            <h2 class="title">Output</h2>
+            <div class="output-content" id="outputArea">
+
+                    {%- if code_result -%}
+                        {{ code_result }}
+                    {%- else -%}
+
+                    <span class="placeholder">Output will appear here after running the code...</span>
+                {%- endif -%}
+            </div>
         </div>
     </div>
+
+    <script>
+        // default hello world program
+        const defaultCode = `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`;
+
+        const codeEditor = document.getElementById('codeEditor');
+        const saveStatus = document.getElementById('saveStatus');
+        const charCount = document.getElementById('charCount');
+        let saveTimeout;
+
+        // load saved code or default
+        window.onload = function() {
+            const savedCode = localStorage.getItem('savedCode');
+            if (savedCode && !codeEditor.value) {
+                codeEditor.value = savedCode;
+            } else if (!codeEditor.value) {
+                codeEditor.value = defaultCode;
+            }
+            updateCharCount();
+        };
+
+        codeEditor.addEventListener('input', function() {
+            clearTimeout(saveTimeout);
+            saveStatus.textContent = 'Saving...';
+            updateCharCount();
+            
+            saveTimeout = setTimeout(() => {
+                localStorage.setItem('savedCode', codeEditor.value);
+                saveStatus.textContent = 'All changes saved';
+            }, 500);
+        });
+
+        function updateCharCount() {
+            charCount.textContent = `Characters: ${codeEditor.value.length}`;
+        }
+
+        function clearCode() {
+            if (confirm('Are you sure you want to clear the editor?')) {
+                codeEditor.value = '';
+                localStorage.removeItem('savedCode');
+                updateCharCount();
+            }
+        }
+
+        function resetToDefault() {
+            if (confirm('Reset to default Hello World program?')) {
+                codeEditor.value = defaultCode;
+                localStorage.setItem('savedCode', defaultCode);
+                updateCharCount();
+            }
+        }
+
+        codeEditor.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+
+        document.getElementById('codeForm').addEventListener('submit', function(e) {
+            localStorage.setItem('savedCode', codeEditor.value);
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,6 @@
+2025-02-14 20:22:51,902 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-02-14 20:22:51,903 - INFO - [33mPress CTRL+C to quit[0m
+2025-02-14 20:22:53,897 - INFO - 127.0.0.1 - - [14/Feb/2025 20:22:53] "GET / HTTP/1.1" 200 -
+2025-02-14 20:22:53,979 - INFO - 127.0.0.1 - - [14/Feb/2025 20:22:53] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-02-14 20:22:55,399 - INFO - 127.0.0.1 - - [14/Feb/2025 20:22:55] "POST /run/ HTTP/1.1" 200 -
