@@ -1,0 +1,1 @@
+This C Code Web App is a simple, browser-based platform for writing, compiling, and executing C programs. Built with Flask, Python, HTML, CSS, and JavaScript, it provides a clean and intuitive interface for testing C code without needing local tools.
